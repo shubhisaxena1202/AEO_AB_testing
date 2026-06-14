@@ -1,0 +1,35 @@
+domain: "project management tools for small teams"
+
+# The ID string that judge.py will look for in answers.
+# Must exactly match how our product appears in variant docs.
+target_product_name: "TaskFlow Pro"
+
+# Model choices
+answer_model: "claude-haiku-4-5-20251001"
+judge_model: "claude-haiku-4-5-20251001"
+embedding_model: "all-MiniLM-L6-v2"   # sentence-transformers, runs locally
+
+# Experiment knobs
+n_repeats: 5           # repeats per (query, arm) pair
+temperature: 0.7       # non-zero so repeats actually vary
+top_k: 3               # chunks retrieved per query
+
+# Power analysis assumptions (design-time, not empirical)
+baseline_citation_rate: 0.30
+min_detectable_effect: 0.20   # relative lift — detect a 20% relative increase
+
+# Stat test
+alpha: 0.05
+power: 0.80
+
+# Content generation
+n_distractors: 5
+n_queries: 40
+
+# Paths (relative to repo root)
+paths:
+  variant_a: "data/content/variant_a.md"
+  variant_b: "data/content/variant_b.md"
+  distractors: "data/content/distractors"
+  queries: "data/queries.json"
+  results: "data/results/results.csv"
