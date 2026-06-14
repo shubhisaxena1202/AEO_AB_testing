@@ -18,7 +18,7 @@ The three platform capabilities it demonstrates:
 | **AI eval framework** | LLM-as-judge scoring with two-layer statistical testing (z-test + paired t-test) |
 | **LLM analytics** | Per-query breakdown, power analysis, bootstrap CI on lift |
 
-The abstractions are generic and pluggable — tasks, evaluators, and metrics are interfaces. AEO is one implementation. Summarization or code-gen could drop in without touching the platform core.
+The abstractions are generic and pluggable where tasks, evaluators, and metrics are interfaces. AEO is one implementation. Summarization or code generation could drop in without changing the platform core.
 
 ---
 
@@ -26,7 +26,7 @@ The abstractions are generic and pluggable — tasks, evaluators, and metrics ar
 
 **The question:** If you rewrite your content in an "answer-engine-friendly" format (FAQ structure, answer-first sentences, concrete stats, chunk-friendly headers), does an LLM answer engine recommend your product more often?
 
-**The wind-tunnel design:** We can't A/B test ChatGPT's/Gemini's real ranker — we don't own it. So we built a RAG answer engine we *do* own and tested content variants inside it.
+**The wind-tunnel design:** We can't A/B test ChatGPT's/Gemini's real ranker — we don't own it. So we build a RAG answer engine we *do* own and tested content variants inside it.
 
 ```
 Corpus A (control)   = [variant_a.md — marketing style] + [5 fixed competitor docs]
@@ -44,7 +44,7 @@ Only the treatment doc differs between corpora. Any change in recommendation rat
 
 ```
 core/
-├── interfaces.py      # Task, Variant, Evaluator, Metric — abstract platform spine
+├── interfaces.py      # Task, Variant, Evaluator, Metric: abstract platform spine
 ├── runner.py          # ExperimentRunner: loops queries × variants × repeats → results.csv
 ├── stats.py           # two-proportion z-test, paired t-test, bootstrap CI, power analysis
 └── store.py           # append/read results.csv
@@ -85,13 +85,13 @@ dashboard/app.py       # Streamlit: rates, lift + CI, per-query charts, raw tria
 
 ### Why this result is still informative
 
-The pilot was designed to demonstrate methodology, not produce a publishable conclusion. At 40 queries/arm the test has ~8% power to detect a 20% relative lift — meaning it would miss a real effect 92% of the time. The required sample size for 80% power is **963 queries/arm**.
+The pilot was designed to demonstrate methodology, not produce a publishable conclusion. At 40 queries/arm the test has ~8% power to detect a 20% relative lift, meaning it would miss a real effect 92% of the time. The required sample size for 80% power is **963 queries/arm**.
 
 ![Power curve](data/results/fig_power_curve.png)
 
 ### Per-query breakdown
 
-The paired analysis shows 8 queries where A outperformed B, 6 where B outperformed A, and 26 ties. The most extreme case (q04): arm A 100% vs arm B 0% across all 5 repeats — a complete flip driven by which chunks were retrieved.
+The paired analysis shows 8 queries where A outperformed B, 6 where B outperformed A, and 26 ties. The most extreme case (q04): arm A 100% vs arm B 0% across all 5 repeats which is a complete flip driven by which chunks were retrieved.
 
 ![Per-query paired analysis](data/results/fig_paired_test.png)
 
@@ -107,7 +107,7 @@ The wide distribution confirms that 200 trials per arm are not enough to pin dow
 
 **Trial unit:** `(query, arm, repeat)`. Repeats at temperature 0.7 handle LLM stochasticity.
 
-**Arm interleaving:** For each `(query, repeat)` pair, arm A and arm B are run back-to-back — not all A then all B. This prevents time-based confounds (rate limits, model drift) from biasing one arm.
+**Arm interleaving:** For each `(query, repeat)` pair, arm A and arm B are run back-to-back and not all A then all B. This prevents time-based confounds (rate limits, model drift) from biasing one arm.
 
 **Two stat layers:**
 1. *Two-proportion z-test* (headline, naive): treats all trials as IID. Fast to interpret but inflated by within-query correlation.
@@ -124,9 +124,9 @@ The wide distribution confirms that 200 trials per arm are not enough to pin dow
 | What is real | What is synthetic |
 |---|---|
 | LLM calls (answer + judge) | Queries — generated, not from real users |
-| Retrieval via embeddings + cosine similarity | Corpus — fictional company docs |
-| Two-layer statistical testing | `accepted` field — proxy for user acceptance, not real behaviour |
-| Power analysis with pre-registered MDE | Answer engine — our RAG, not ChatGPT/Gemini |
+| Retrieval via embeddings + cosine similarity | Corpus : our fictional company docs |
+| Two-layer statistical testing | `accepted` field, a proxy for user acceptance, not real behaviour |
+| Power analysis with pre-registered MDE | Answer engine is our RAG, not ChatGPT/Gemini |
 
 **This is a methodology demonstration, not a claim of real-world lift.**
 
